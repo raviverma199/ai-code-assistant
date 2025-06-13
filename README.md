@@ -36,7 +36,7 @@
 ## 📸 Screenshot
 
 > _Paste your code. Let RefactorBot do the rest._  
-![screenshot](https://github.com/raviverma199/RefactorBot/blob/main/ai-code-refactor-ui/public/video.mp4)
+![screenshot](https://github.com/raviverma199/RefactorBot/blob/main/ai-code-refactor-ui/public/Screenshot.png)
 
 ---
 
