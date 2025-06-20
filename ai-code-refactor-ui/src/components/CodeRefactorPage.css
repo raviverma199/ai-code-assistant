@@ -293,3 +293,55 @@ textarea {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+
+.github-login {
+  display: flex;
+  align-items: center;
+  background-color: #24292e;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+  transition: background 0.2s;
+}
+
+.github-login:hover {
+  background-color: #333;
+}
+
+.github-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%;
+  left: 0;
+  background-color: #24292e;
+  border-radius: 6px;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  min-width: 200px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.dropdown-menu li {
+  padding: 6px 16px;
+}
+
+.dropdown-menu li:hover {
+  background-color: #333;
+}
+
+.dropdown-menu a {
+  color: white;
+  text-decoration: none;
+  display: block;
+}

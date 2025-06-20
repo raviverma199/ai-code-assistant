@@ -16,9 +16,42 @@ function CodeToolPage() {
   const [aiResult, setAiResult] = useState('');
   const [copiedText, setCopiedText] = useState('');
   const [displayedText, setDisplayedText] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [repos, setRepos] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [username, setUsername] = useState('');
+
+
+useEffect(() => {
+  axios.get('http://localhost:2020/auth/me', { withCredentials: true })
+    .then(res => {
+      setIsLoggedIn(res.data.loggedIn);
+      if (res.data.loggedIn) {
+        console.log('User is logged in:', res.data.user.username);
+        setUsername(res.data.user.username);
+        fetchRepos();
+      }
+    })
+    .catch(err => {
+      console.error('Error checking login status', err);
+    });
+}, []);
+
 
   const actions = ['Refactor Code', 'Explain Logic', 'Fix Errors', 'Suggest Improvements', 'Add Comments', 'Optimize Performance'];
   const languages = ['JavaScript', 'TypeScript'];
+
+const fetchRepos = async () => {
+  try {
+    const res = await axios.get('http://localhost:2020/auth/github/repositories', {
+      withCredentials: true,
+    });
+    console.log('Fetched Repos:', res.data.repos);
+    setRepos(res.data.repos);
+  } catch (error) {
+    console.error('Failed to fetch repos', error);
+  }
+};
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -173,6 +206,28 @@ function CodeToolPage() {
   return (
     <div className="tool-container">
       <div className="top-bar">
+<div style={{
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '6px 12px',
+  background: '#2d2d2d',
+  borderRadius: '8px',
+  color: '#f5f5f5',
+  fontSize: '13px',
+  fontWeight: '500',
+  marginRight: '12px',
+  boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+}}>
+  <img
+    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+    alt="GitHub Avatar"
+    style={{ width: '18px', height: '18px' }}
+  />
+  @{username}
+</div>
+
+
         <div className="logo">🚀 Code Assistant</div>
         <div className="top-bar-controls">
           <button className="toggle-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
@@ -185,10 +240,47 @@ function CodeToolPage() {
             ))}
           </select>
 
-          <div className="github-login" onClick={handleGitHubLogin}>
-            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" />
-            Login with GitHub
-          </div>
+     <div className="github-section">
+  {!isLoggedIn ? (
+    <div className="github-login" onClick={handleGitHubLogin}>
+      <img
+        src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+        alt="GitHub"
+        style={{ width: '20px', marginRight: '8px' }}
+      />
+      Login with GitHub
+    </div>
+  ) : (
+    <div className="github-dropdown">
+      <button
+        className="github-login dropdown-toggle"
+        onClick={() => setShowDropdown(!showDropdown)}
+      >
+        <img
+          src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+          alt="GitHub"
+          style={{ width: '20px', marginRight: '8px' }}
+        />
+        My GitHub Repos ▼
+      </button>
+
+      {showDropdown && (
+        <ul className="dropdown-menu">
+          {repos.map((repo) => (
+            <li key={repo.id}>
+              <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                {repo.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )}
+</div>
+
+
+
         </div>
       </div>
 
