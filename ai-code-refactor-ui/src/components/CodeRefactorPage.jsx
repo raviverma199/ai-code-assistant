@@ -47,7 +47,7 @@ function CodeToolPage() {
   };
 
   const handleGitHubLogin = () => {
-    window.location.href = 'https://github.com/login/oauth/authorize?client_id=YOUR_CLIENT_ID';
+    window.location.href = 'http://localhost:2020/auth/github';
   };
 
   const getLanguageExtension = () => {

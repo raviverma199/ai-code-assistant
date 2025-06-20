@@ -2,6 +2,7 @@ import express from 'express';
 import refactorRouter from './Routes/refactor.route';
 import ExecutionRouter from './Routes/code.route';
 import AIRouter from './Routes/ai.route';
+import OAuthRouter from './Routes/oauth.route';
 import cors from 'cors';
 const app = express();
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use(cors({
 app.use('/api', refactorRouter);
 app.use('/api/code', ExecutionRouter);
 app.use('/api', AIRouter);
+app.use('/auth', OAuthRouter);
 
 app.listen(2020, () => {
     console.log('Server is running on port 2020');
