@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { refactorCodeService } from "../services/refactor.service";
+import { refactorCodeService } from "../services/coderefactor.service";
 import prettier from "prettier";
 
 export const refactorCodeController = async (req: Request, res: Response) => {
