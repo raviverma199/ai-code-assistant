@@ -1,6 +1,6 @@
 # AI Code Assistant	
 
-**AI Code Assistant** is your AI-powered coding assistant designed to simplify the development process by offering **code refactoring**, **bug fixing**, **logic explanation**, and **code execution**. Whether you’re a beginner or an experienced dev, RefactorBot saves you hours by automating repetitive code reviews and providing meaningful suggestions.
+AI Code Assistant is your AI-powered coding assistant designed to simplify the development process by offering code refactoring, bug fixing, logic explanation, and code execution. Whether you’re a beginner or an experienced developer, AI Code Assistant saves you hours by automating repetitive code reviews and providing meaningful suggestions.
 
 ---
 
@@ -11,6 +11,7 @@
 - 🐛 **Fix Errors** – Detect and fix bugs instantly.
 - 💡 **Suggest Improvements** – Improve performance, readability, and follow best practices.
 - ⚙️ **Run Code** – Execute code directly in the browser via Judge0 API.
+- 🌳 AST Parsing – Uses Abstract Syntax Tree parsing for smarter code analysis and transformations.
 - 🌐 **Multi-language Execution (coming soon)** – Python, Java, C++, Go, and more.
 
 ---
@@ -29,7 +30,7 @@
 - **Judge0 API** – For real-time code compilation and execution
 
 ### 🔐 Authentication
-- **GitHub OAuth(working)** – Secure login via GitHub
+- **GitHub OAuth** – Secure login via GitHub
 
 ---
 
