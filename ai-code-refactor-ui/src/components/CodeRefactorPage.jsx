@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import './CodeRefactorPage.css';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import axios from 'axios';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { motion } from 'framer-motion';
+import { javascript } from '@codemirror/lang-javascript';
+import './CodeRefactorPage.css';
+
+const CodeMirror = lazy(() => import('@uiw/react-codemirror'));
+const Spinner = () => <div className="spinner">⏳ Loading Editor...</div>;
 
 function CodeToolPage() {
   const [code, setCode] = useState('');
@@ -21,37 +23,42 @@ function CodeToolPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [username, setUsername] = useState('');
 
-
-useEffect(() => {
-  axios.get('http://localhost:2020/auth/me', { withCredentials: true })
-    .then(res => {
-      setIsLoggedIn(res.data.loggedIn);
-      if (res.data.loggedIn) {
-        console.log('User is logged in:', res.data.user.username);
-        setUsername(res.data.user.username);
-        fetchRepos();
-      }
-    })
-    .catch(err => {
-      console.error('Error checking login status', err);
-    });
-}, []);
-
-
   const actions = ['Refactor Code', 'Explain Logic', 'Fix Errors', 'Suggest Improvements', 'Add Comments', 'Optimize Performance'];
   const languages = ['JavaScript', 'TypeScript'];
 
-const fetchRepos = async () => {
-  try {
-    const res = await axios.get('http://localhost:2020/auth/github/repositories', {
-      withCredentials: true,
-    });
-    console.log('Fetched Repos:', res.data.repos);
-    setRepos(res.data.repos);
-  } catch (error) {
-    console.error('Failed to fetch repos', error);
-  }
-};
+  useEffect(() => {
+    const saved = localStorage.getItem('code');
+    if (saved) setCode(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('code', code);
+  }, [code]);
+
+  useEffect(() => {
+    axios.get('http://localhost:2020/auth/me', { withCredentials: true })
+      .then(res => {
+        setIsLoggedIn(res.data.loggedIn);
+        if (res.data.loggedIn) {
+          console.log('User is logged in:', res.data.user.username);
+          setUsername(res.data.user.username);
+          fetchRepos();
+        }
+      })
+      .catch(err => {
+        console.error('Error checking login status', err);
+      });
+  }, []);
+
+  const fetchRepos = async () => {
+    try {
+      const res = await axios.get('http://localhost:2020/auth/github/repositories', { withCredentials: true });
+      console.log('Fetched Repos:', res.data.repos);
+      setRepos(res.data.repos);
+    } catch (error) {
+      console.error('Failed to fetch repos', error);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -70,7 +77,7 @@ const fetchRepos = async () => {
       setDisplayedText((prev) => prev + text[i]);
       i++;
       if (i >= text.length) clearInterval(interval);
-    }, 10); // typing speed
+    }, 10);
   };
 
   const handleCopy = (text) => {
@@ -118,7 +125,7 @@ const fetchRepos = async () => {
       });
 
       const raw = response.data.result || 'No response from AI.';
-      const final = raw.includes('```') ? raw : `\`\`\`${language.toLowerCase()}\n${raw}\n\`\`\``;
+      const final = raw.includes('```') ? raw : `\u0060\u0060\u0060${language.toLowerCase()}\n${raw}\n\u0060\u0060\u0060`;
 
       setAiResult(final);
     } catch (error) {
@@ -206,27 +213,26 @@ const fetchRepos = async () => {
   return (
     <div className="tool-container">
       <div className="top-bar">
-<div style={{
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '6px 12px',
-  background: '#2d2d2d',
-  borderRadius: '8px',
-  color: '#f5f5f5',
-  fontSize: '13px',
-  fontWeight: '500',
-  marginRight: '12px',
-  boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-}}>
-  <img
-    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-    alt="GitHub Avatar"
-    style={{ width: '18px', height: '18px' }}
-  />
-  @{username}
-</div>
-
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '6px 12px',
+          background: '#2d2d2d',
+          borderRadius: '8px',
+          color: '#f5f5f5',
+          fontSize: '13px',
+          fontWeight: '500',
+          marginRight: '12px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+        }}>
+          <img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            alt="GitHub Avatar"
+            style={{ width: '18px', height: '18px' }}
+          />
+          @{username}
+        </div>
 
         <div className="logo">🚀 Code Assistant</div>
         <div className="top-bar-controls">
@@ -240,64 +246,63 @@ const fetchRepos = async () => {
             ))}
           </select>
 
-     <div className="github-section">
-  {!isLoggedIn ? (
-    <div className="github-login" onClick={handleGitHubLogin}>
-      <img
-        src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-        alt="GitHub"
-        style={{ width: '20px', marginRight: '8px' }}
-      />
-      Login with GitHub
-    </div>
-  ) : (
-    <div className="github-dropdown">
-      <button
-        className="github-login dropdown-toggle"
-        onClick={() => setShowDropdown(!showDropdown)}
-      >
-        <img
-          src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-          alt="GitHub"
-          style={{ width: '20px', marginRight: '8px' }}
-        />
-        My GitHub Repos ▼
-      </button>
+          <div className="github-section">
+            {!isLoggedIn ? (
+              <div className="github-login" onClick={handleGitHubLogin}>
+                <img
+                  src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  alt="GitHub"
+                  style={{ width: '20px', marginRight: '8px' }}
+                />
+                Login with GitHub
+              </div>
+            ) : (
+              <div className="github-dropdown">
+                <button
+                  className="github-login dropdown-toggle"
+                  onClick={() => setShowDropdown(!showDropdown)}
+                >
+                  <img
+                    src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                    alt="GitHub"
+                    style={{ width: '20px', marginRight: '8px' }}
+                  />
+                  My GitHub Repos ▼
+                </button>
 
-      {showDropdown && (
-        <ul className="dropdown-menu">
-          {repos.map((repo) => (
-            <li key={repo.id}>
-              <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                {repo.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )}
-</div>
-
-
-
+                {showDropdown && (
+                  <ul className="dropdown-menu">
+                    {repos.map((repo) => (
+                      <li key={repo.id}>
+                        <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                          {repo.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="horizontal-layout">
         <div className="editor-panel">
           <h3>Paste your {language} code below</h3>
-          <CodeMirror
-            value={code}
-            height="400px"
-            theme={theme}
-            extensions={[getLanguageExtension()]}
-            onChange={(value) => {
-              setCode(value);
-              if (selectedAction) setSelectedAction(null);
-              setExecutionResult('');
-            }}
-          />
+          <Suspense fallback={<Spinner />}>
+            <CodeMirror
+              value={code}
+              height="400px"
+              theme={theme}
+              extensions={[getLanguageExtension()]}
+              onChange={(value) => {
+                setCode(value);
+                if (selectedAction) setSelectedAction(null);
+                setExecutionResult('');
+              }}
+            />
+          </Suspense>
 
           <button className="execute-btn" onClick={executeCode}>▶️ Execute Code</button>
 
